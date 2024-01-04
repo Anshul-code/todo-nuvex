@@ -19,11 +19,11 @@
                         <a class="btn btn-primary mb-2" href="{{ route('todos.create') }}" role="button"><i class="fa fa-plus-circle" aria-hidden="true"></i> Create </a>
 
                         
-                        <table class="table table-striped table-bordered" id="todosTable">
+                        <table class="table table-bordered" id="todosTable">
                             <thead>
                                 <tr>
-                                    <th>Status</th>
-                                    <th>Title</th>
+                                    <th>Completed ?</th>
+                                    <th>Todo</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -46,8 +46,71 @@
         $(function () {
             createTable();
 
-        });
+            // Update Status on click
+            $(document).on('click', '.custom-todo-check', function() {
+                let id = $(this).data('id');
+                let isChecked = $(this).is(':checked');
 
+                let url = "{{ route('todos.update.status', ['todo' => ':id']) }}";
+                url = url.replace(":id", id);
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        status: Number(isChecked),
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        $('#todosTable').DataTable().ajax.reload();
+
+                        if(response.success) {
+                            toastr.success(response.message);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                });
+            });
+
+            // Delete on click
+            $(document).on('click', '.delete-todo', function() {
+                let id = $(this).data('id');
+                let url = "{{ route('todos.destroy', ['todo' => ':id']) }}";
+                url = url.replace(':id', id);
+
+                $.confirm({
+                    title: 'Alert!',
+                    content: 'Are you sure you want to delete this todo?',
+                    buttons: {
+                        confirm: function () {
+                            $.ajax({
+                                type: "DELETE",
+                                url: url,
+                                data: {
+                                    _token: "{{ csrf_token() }}"
+                                },
+                                success: function (response) {
+                                    $('#todosTable').DataTable().ajax.reload();
+
+                                    if(response.success) {
+                                        toastr.success(response.message);
+                                    } else {
+                                        toastr.error(response.message);
+                                    }
+                                }
+                            });
+                        },
+                        cancel: function () {
+                        },
+                    }
+                });
+            });
+            
+
+        }); // Document ready END
+
+        // Create DataTable
         function createTable(){
             $('#todosTable').DataTable({
                 'bDestroy': true,
@@ -58,7 +121,7 @@
                 "iDisplayLength": 10,
                 ajax: "{{ route('todos.index') }}",
                 columns: [
-                    { data: 'status', name: 'status', width: '20%' },
+                    { data: 'status', name: 'status', width: '8%' },
                     { data: 'title', name: 'title'},
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],

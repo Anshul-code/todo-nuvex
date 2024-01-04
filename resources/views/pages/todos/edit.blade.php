@@ -16,8 +16,9 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('todos.store') }}" method="post">
+                        <form action="{{ route('todos.update', ['todo' => $todo->id]) }}" method="post">
                             @csrf
+                            @method('PUT')
                             <div class="form-group">
                               <label for="title">Title</label>
                               <input
@@ -27,6 +28,7 @@
                                   id="title"
                                   placeholder="Enter title of todo"
                                   maxlength="255"
+                                  value="{{ $todo->title }}"
                               >
                               @error('title')
                                   <span class="font-weight-bold text-danger">{{ $message }}</span>
@@ -35,7 +37,7 @@
 
                             <div class="form-group">
                                 <div class="icheck-primary d-inline">
-                                    <input type="checkbox" value="1" name="status" id="status">
+                                    <input type="checkbox" value="1" name="status" id="status" {{ $todo->status ? 'checked' : '' }}>
                                     <label for="status">Is Completed ?</label>
                                 </div>
                                 @error('status')

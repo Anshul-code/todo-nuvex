@@ -18,4 +18,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // TODOS Routes
+Route::post('/todos/update-status/{todo}', [TodoController::class, 'updateStatus'])->name('todos.update.status');
 Route::resource('todos', TodoController::class);

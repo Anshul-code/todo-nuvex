@@ -27,6 +27,7 @@
                                   id="title"
                                   placeholder="Enter title of todo"
                                   maxlength="255"
+                                  value="{{ old('title') }}"
                               >
                               @error('title')
                                   <span class="font-weight-bold text-danger">{{ $message }}</span>
